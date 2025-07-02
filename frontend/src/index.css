@@ -1,0 +1,21 @@
+h2 {
+  color: green;
+  font-style: italic;
+}
+
+.contacts{
+  color: grey;
+  padding:  10px 5px;
+  font-size: 15px;
+}
+
+.searchBoxContainer{
+  margin:  10px 0;
+}
+
+form{
+  display:inline-block;
+  
+  padding: 10px;  
+  background-color: aqua;
+}
