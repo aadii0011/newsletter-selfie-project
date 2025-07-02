@@ -1,39 +1,36 @@
-const express = require("express");
-const cors = require("cors");
-const app = express();
+const nodemailer = require("nodemailer");
+const fs = require("fs");
 const path = require("path");
-const multer = require("multer");
-const sendEmailWithImage = require("./sendEmailWithImage");
 
-require("dotenv").config();
-
-app.use(cors());
-app.use(express.json());
-app.use("/uploads", express.static("uploads"));
-
-const storage = multer.diskStorage({
-  destination: "uploads/",
-  filename: (req, file, cb) => {
-    cb(null, Date.now() + "-" + file.originalname);
-  },
-});
-
-const upload = multer({ storage });
-
-app.post("/upload", upload.single("image"), async (req, res) => {
+const sendEmailWithImage = async (imagePath) => {
   try {
-    const filePath = path.join(__dirname, req.file.path);
-    const fileName = req.file.originalname;
-    await sendEmailWithImage(filePath, fileName);
-    res.status(200).json({ message: "Selfie sent via email!" });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Failed to send selfie" });
-  }
-});
+    // Replace these with your Gmail address and App Password
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: "your-email@gmail.com",
+        pass: "your-app-password", // 👈 App Password from Google
+      },
+    });
 
-// ✅ Correct Render port binding
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-});
+    const mailOptions = {
+      from: '"Newsletter Bot" <your-email@gmail.com>',
+      to: "adityadrools@gmail.com", // You can add multiple if needed
+      subject: "📸 New Selfie Submitted!",
+      text: "A user just submitted a selfie!",
+      attachments: [
+        {
+          filename: "selfie.jpg",
+          path: imagePath,
+        },
+      ],
+    };
+
+    await transporter.sendMail(mailOptions);
+    console.log("✅ Email sent with selfie.");
+  } catch (error) {
+    console.error("❌ Failed to send email:", error);
+  }
+};
+
+module.exports = sendEmailWithImage;
