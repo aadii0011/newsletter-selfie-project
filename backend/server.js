@@ -1,21 +1,28 @@
+const express = require("express");
 const nodemailer = require("nodemailer");
-const fs = require("fs");
 const path = require("path");
 
-const sendEmailWithImage = async (imagePath) => {
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+app.use(express.json());
+
+// POST route to send email with image
+app.post("/send-email", async (req, res) => {
   try {
-    // Replace these with your Gmail address and App Password
+    const imagePath = path.join(__dirname, "selfie.jpg"); // Make sure this file exists
+
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
         user: "your-email@gmail.com",
-        pass: "your-app-password", // 👈 App Password from Google
+        pass: "your-app-password",
       },
     });
 
     const mailOptions = {
       from: '"Newsletter Bot" <your-email@gmail.com>',
-      to: "adityadrools@gmail.com", // You can add multiple if needed
+      to: "adityadrools@gmail.com",
       subject: "📸 New Selfie Submitted!",
       text: "A user just submitted a selfie!",
       attachments: [
@@ -28,9 +35,14 @@ const sendEmailWithImage = async (imagePath) => {
 
     await transporter.sendMail(mailOptions);
     console.log("✅ Email sent with selfie.");
+    res.status(200).send("Email sent successfully");
   } catch (error) {
     console.error("❌ Failed to send email:", error);
+    res.status(500).send("Failed to send email");
   }
-};
+});
 
-module.exports = sendEmailWithImage;
+// Start the server (required for Render)
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+});
