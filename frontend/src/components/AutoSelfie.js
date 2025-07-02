@@ -20,7 +20,7 @@ const AutoSelfie = () => {
     if (!imageSrc) return;
 
     try {
-      await fetch('http://localhost:3001/upload', {
+      await fetch('http://localhost:5000/upload', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ image: imageSrc }),

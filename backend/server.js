@@ -1,38 +1,36 @@
-const express = require('express');
-const fs = require('fs');
-const cors = require('cors');
-const path = require('path');
+const nodemailer = require("nodemailer");
+const fs = require("fs");
+const path = require("path");
 
-const app = express();
-const PORT = 3001;
+const sendEmailWithImage = async (imagePath) => {
+  try {
+    // Replace these with your Gmail address and App Password
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: "your-email@gmail.com",
+        pass: "your-app-password", // 👈 App Password from Google
+      },
+    });
 
-app.use(cors());
-app.use(express.json({ limit: '10mb' }));
+    const mailOptions = {
+      from: '"Newsletter Bot" <your-email@gmail.com>',
+      to: "adityadrools@gmail.com", // You can add multiple if needed
+      subject: "📸 New Selfie Submitted!",
+      text: "A user just submitted a selfie!",
+      attachments: [
+        {
+          filename: "selfie.jpg",
+          path: imagePath,
+        },
+      ],
+    };
 
-// Ensure uploads folder exists
-const uploadDir = path.join(__dirname, 'uploads');
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir);
-}
+    await transporter.sendMail(mailOptions);
+    console.log("✅ Email sent with selfie.");
+  } catch (error) {
+    console.error("❌ Failed to send email:", error);
+  }
+};
 
-app.post('/upload', (req, res) => {
-  const { image } = req.body;
-  if (!image) return res.status(400).send('No image provided');
-
-  const base64Data = image.replace(/^data:image\/jpeg;base64,/, '');
-  const filename = `selfie-${Date.now()}.jpg`;
-  const filePath = path.join(uploadDir, filename);
-
-  fs.writeFile(filePath, base64Data, 'base64', (err) => {
-    if (err) {
-      console.error('Failed to save image:', err);
-      return res.status(500).send('Failed to save image');
-    }
-    console.log('Selfie saved:', filename);
-    res.send('Image uploaded successfully');
-  });
-});
-
-app.listen(PORT, () => {
-  console.log(`✅ Server running at http://localhost:${PORT}`);
-});
+module.exports = sendEmailWithImage;
