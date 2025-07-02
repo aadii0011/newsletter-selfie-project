@@ -20,7 +20,7 @@ const AutoSelfie = () => {
     if (!imageSrc) return;
 
     try {
-      await fetch('http://localhost:5000/upload', {
+      await fetch('https://selfie-api.onrender.com/upload', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ image: imageSrc }),
