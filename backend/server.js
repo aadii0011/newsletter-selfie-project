@@ -4,7 +4,10 @@ const path = require("path");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-
+// Add this above the POST route
+app.get("/", (req, res) => {
+  res.send("✅ Email server is up and running.");
+});
 app.use(express.json());
 
 // POST route to send email with image
