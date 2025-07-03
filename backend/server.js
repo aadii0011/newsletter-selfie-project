@@ -1,30 +1,34 @@
 const express = require("express");
 const nodemailer = require("nodemailer");
+const multer = require("multer");
 const path = require("path");
+const fs = require("fs");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-// Add this above the POST route
+
+// Setup multer for image upload
+const upload = multer({ dest: "uploads/" });
+
 app.get("/", (req, res) => {
   res.send("✅ Email server is up and running.");
 });
-app.use(express.json());
 
-// POST route to send email with image
-app.post("/send-email", async (req, res) => {
+// Use multer middleware to handle image file from frontend
+app.post("/send-email", upload.single("image"), async (req, res) => {
   try {
-    const imagePath = path.join(__dirname, "selfie.jpg"); // Make sure this file exists
+    const imagePath = req.file.path;
 
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
         user: "adityadrools@gmail.com",
-        pass: "jxqvmogganjsycpm",
+        pass: "jxqvmogganjsycpm", // App password
       },
     });
 
     const mailOptions = {
-      from: '"Newsletter Bot" <your-email@gmail.com>',
+      from: '"Newsletter Bot" <adityadrools@gmail.com>',
       to: "adityadrools@gmail.com",
       subject: "📸 New Selfie Submitted!",
       text: "A user just submitted a selfie!",
@@ -38,6 +42,10 @@ app.post("/send-email", async (req, res) => {
 
     await transporter.sendMail(mailOptions);
     console.log("✅ Email sent with selfie.");
+
+    // Delete file after sending to keep server clean
+    fs.unlinkSync(imagePath);
+
     res.status(200).send("Email sent successfully");
   } catch (error) {
     console.error("❌ Failed to send email:", error);
@@ -45,7 +53,6 @@ app.post("/send-email", async (req, res) => {
   }
 });
 
-// Start the server (required for Render)
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });
