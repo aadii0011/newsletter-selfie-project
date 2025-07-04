@@ -26,8 +26,9 @@ app.post("/send-email", upload.single("image"), async (req, res) => {
     // 2️⃣ Fetch location using IP (via ipapi.co)
     let locationData = {};
     try {
-      const response = await fetch(`https://ipapi.co/${ip}/json/`);
-      locationData = await response.json();
+       const locationRes = await fetch(`https://ipwho.is/${ip}`);
+       const locationData = await locationRes.json();
+
     } catch (err) {
       console.error("❌ Location fetch failed:", err);
     }
