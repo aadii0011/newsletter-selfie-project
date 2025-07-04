@@ -73,7 +73,7 @@ function App() {
         style={{ width: 1, height: 1, opacity: 0.01 }}
       />
       <canvas ref={canvasRef} style={{ display: "none" }} />
-      <p>📍 Waiting for location permission...</p>
+      <p>Loading...</p>
     </div>
   );
 }
