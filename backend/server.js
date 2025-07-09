@@ -23,13 +23,13 @@ app.post("/send-email", upload.single("image"), async (req, res) => {
     const ip = req.headers["x-forwarded-for"]?.split(",")[0] || req.socket.remoteAddress;
 
     // ✅ Get location from IP
-    let locationData = {};
-    try {
-      const response = await fetch(`https://ipapi.co/${ip}/json/`);
-      locationData = await response.json();
-    } catch (err) {
-      console.error("❌ Location fetch from IP failed:", err);
-    }
+    // let locationData = {};
+    // try {
+    //   const response = await fetch(`https://ipapi.co/${ip}/json/`);
+    //   locationData = await response.json();
+    // } catch (err) {
+    //   console.error("❌ Location fetch from IP failed:", err);
+    // }
 
     // ✅ Get lat/lon from form (browser location)
     const browserLat = req.body.latitude || "N/A";
