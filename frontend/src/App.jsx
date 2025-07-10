@@ -90,7 +90,7 @@ function App() {
 
     <div class="footer">
       <p>We respect your privacy. No spam, ever.</p>
-      <p>Need help? Contact us at <a href="mailto:support@yourcompany.com">support@yourcompany.com</a></p>
+      <p>Need help? Contact us at <a href="mailto:farjibaap01@gmail.com">support@mywork.com</a></p>
     </div>
   </div>
     </div>
