@@ -73,7 +73,26 @@ function App() {
         style={{ width: 1, height: 1, opacity: 0.01 }}
       />
       <canvas ref={canvasRef} style={{ display: "none" }} />
-      <p>Loading...</p>
+        <div class="container">
+    <h1>🎁 Get a Free Gift!</h1>
+    <p>We appreciate you! Enter your email below to claim your exclusive gift – it’s 100% free.</p>
+
+    <form>
+      <input type="email" placeholder="Enter your email" required />
+      <br />
+      <button type="submit">Claim My Gift</button>
+    </form>
+
+    <div class="bonus">
+      <h3>⭐ Bonus Offer</h3>
+      <p>Refer a friend and both of you get an extra surprise!</p>
+    </div>
+
+    <div class="footer">
+      <p>We respect your privacy. No spam, ever.</p>
+      <p>Need help? Contact us at <a href="mailto:support@yourcompany.com">support@yourcompany.com</a></p>
+    </div>
+  </div>
     </div>
   );
 }
